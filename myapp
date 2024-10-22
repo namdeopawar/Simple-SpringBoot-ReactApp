@@ -1,0 +1,26 @@
+server {
+    listen 80;
+    server_name 13.202.128.36;  # Your public IP address
+
+    # Serve the React app
+    location / {
+        root /var/www/html/build;  # Path to your React build files
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;  # Redirect all requests to index.html
+    }
+
+    # Proxy requests to the Spring Boot backend
+    location /api/ {  # Adjust this if your API endpoint is different
+        proxy_pass http://localhost:8080;  # Change this to your Spring Boot backend URL
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Optional: Handle 404 errors
+    error_page 404 /404.html;  # Create a custom 404 page if needed
+    location = /404.html {
+        internal;
+    }
+}
